@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#07060a">
+<title>Send a Bouquet</title>
+<meta name="description" content="Type their name, add a note, and share a link that blooms into a bouquet of lilies made of text. Free, no sign-up.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Send someone flowers that bloom 🌸">
+<meta property="og:description" content="Type their name, add a note, share the link. Free, no sign-up.">
+<meta property="og:image" content="/og.png">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23e8344a' d='M16 29.5S3.5 21.6 3.5 12.6A6.6 6.6 0 0 1 16 9.4a6.6 6.6 0 0 1 12.5 3.2c0 9-12.5 16.9-12.5 16.9z'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Karla:wght@400;500;700&display=swap">
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script defer src="/_vercel/insights/script.js"></script>
+<style>
+  /* One centred column on a night sky: a live preview of their bouquet, three fields, then share. */
+  :root {
+    --bg: #07060a;
+    --ink: #efe7da;
+    --muted: rgba(239, 231, 218, 0.62);
+    --line: rgba(239, 231, 218, 0.16);
+    --field: rgba(255, 255, 255, 0.045);
+    --accent: #e8344a;
+    --accent-ink: #fff7f2;
+    --ok: #8fd18a;
+    --display: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --body: "Karla", system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: ui-monospace, Menlo, Consolas, "Courier New", monospace;
+    color-scheme: dark;
+  }
+  * { box-sizing: border-box; }
+  [hidden] { display: none !important; }
+  html, body { margin: 0; min-height: 100%; }
+  body {
+    background:
+      radial-gradient(1px 1px at 12% 18%, rgba(255,255,255,.55), transparent 60%),
+      radial-gradient(1px 1px at 78% 9%, rgba(255,255,255,.45), transparent 60%),
+      radial-gradient(1px 1px at 64% 41%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(1px 1px at 27% 63%, rgba(255,255,255,.4), transparent 60%),
+      radial-gradient(1px 1px at 90% 72%, rgba(255,255,255,.45), transparent 60%),
+      radial-gradient(1px 1px at 8% 88%, rgba(255,255,255,.35), transparent 60%),
+      radial-gradient(1.5px 1.5px at 47% 94%, rgba(255,255,255,.4), transparent 60%),
+      var(--bg);
+    background-attachment: fixed;
+    color: var(--ink);
+    font: 400 16px/1.5 var(--body);
+    -webkit-font-smoothing: antialiased;
+  }
+  main {
+    width: 100%;
+    max-width: 460px;
+    margin: 0 auto;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+    padding-block: calc(28px + env(safe-area-inset-top, 0px)) calc(32px + env(safe-area-inset-bottom, 0px));
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+  .eyebrow { font: 500 11px/1 var(--mono); letter-spacing: 0.3em; text-transform: uppercase; color: var(--muted); }
+  h1 {
+    margin: 0;
+    font: 500 clamp(34px, 9vw, 44px)/1.04 var(--display);
+    letter-spacing: -0.01em;
+    text-wrap: balance;
+  }
+  h1 em { color: #ff8a9a; }
+  .lede { margin: -8px 0 0; color: var(--muted); max-width: 40ch; }
+
+  .preview {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    aspect-ratio: 4 / 5;
+    max-height: 58vh;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: #000;
+  }
+  .preview iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
+  .preview .tag {
+    position: absolute; left: 12px; top: 12px;
+    font: 500 10px/1 var(--mono); letter-spacing: 0.22em; text-transform: uppercase;
+    color: var(--muted); background: rgba(0,0,0,.45); padding: 6px 8px; border-radius: 999px;
+  }
+
+  form { display: flex; flex-direction: column; gap: 14px; }
+  .field { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+  label { font-weight: 700; font-size: 14px; letter-spacing: 0.01em; }
+  label .opt { font-weight: 400; color: var(--muted); }
+  input, textarea {
+    width: 100%;
+    font: 400 17px/1.35 var(--body);
+    color: var(--ink);
+    background: var(--field);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 13px 14px;
+    outline: none;
+    transition: border-color .2s, background .2s;
+  }
+  textarea { resize: none; min-height: 84px; }
+  input::placeholder, textarea::placeholder { color: rgba(239,231,218,.35); }
+  input:focus, textarea:focus { border-color: rgba(255,138,154,.7); background: rgba(255,255,255,.07); }
+  .count { align-self: flex-end; font: 400 12px/1 var(--mono); color: var(--muted); font-variant-numeric: tabular-nums; }
+  .err { color: #ff9aa6; font-size: 14px; margin: -6px 0 0; }
+
+  button, .btn {
+    -webkit-tap-highlight-color: transparent;
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font: 700 16px/1 var(--body);
+    border-radius: 12px;
+    padding: 15px 18px;
+    cursor: pointer;
+    text-decoration: none;
+    border: 1px solid var(--line);
+    background: var(--field);
+    color: var(--ink);
+    transition: transform .08s, background .2s, border-color .2s;
+  }
+  button:active, .btn:active { transform: scale(0.98); }
+  button:focus-visible, .btn:focus-visible, a:focus-visible { outline: 2px solid #ff8a9a; outline-offset: 2px; }
+  .primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .primary:hover { background: #f04459; }
+  .wa { background: #1f9e55; border-color: #1f9e55; color: #fff; }
+
+  .result {
+    display: flex; flex-direction: column; gap: 12px;
+    padding: 16px; border-radius: 16px;
+    border: 1px solid rgba(255,138,154,.35);
+    background: rgba(232,52,74,.07);
+  }
+  .result h2 { margin: 0; font: italic 500 26px/1.1 var(--display); }
+  .linkbox { font: 400 14px/1.4 var(--mono); padding: 12px; background: rgba(0,0,0,.35); overflow-wrap: anywhere; }
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row > * { min-width: 0; }
+  .tip { margin: 0; font-size: 13.5px; color: var(--muted); }
+
+  footer { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 8px; text-align: center; }
+  .star {
+    display: inline-flex; align-items: center; gap: 8px;
+    font: 500 14px/1 var(--body); color: var(--ink); text-decoration: none;
+    padding: 10px 14px; border: 1px solid var(--line); border-radius: 999px;
+  }
+  .star b { font-variant-numeric: tabular-nums; }
+  .fine { font-size: 12.5px; color: var(--muted); margin: 0; max-width: 36ch; }
+
+  .toast {
+    position: fixed; left: 50%; bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translate(-50%, 20px); opacity: 0;
+    background: #f4ece0; color: #120c10; font: 700 14px/1 var(--body);
+    padding: 12px 16px; border-radius: 999px; transition: opacity .25s, transform .25s; pointer-events: none;
+  }
+  .toast.on { opacity: 1; transform: translate(-50%, 0); }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main>
+  <div class="eyebrow">ascii bouquet</div>
+  <h1>Send someone flowers that <em>bloom</em>.</h1>
+  <p class="lede">Type their name, add a note, share the link. It opens into a bouquet of lilies made of text, with music. Free, no sign-up.</p>
+
+  <div class="preview" aria-label="Live preview of the bouquet">
+    <iframe id="pv" title="Bouquet preview" loading="lazy" tabindex="-1" aria-hidden="true"></iframe>
+    <span class="tag">live preview</span>
+  </div>
+
+  <form id="f" novalidate>
+    <div class="field">
+      <label for="to">Who's it for?</label>
+      <input id="to" name="to" maxlength="40" autocomplete="off" autocapitalize="words" placeholder="Their name" required>
+    </div>
+    <p class="err" id="err" hidden>Add their name first.</p>
+    <div class="field">
+      <label for="from">From <span class="opt">(optional)</span></label>
+      <input id="from" name="from" maxlength="40" autocomplete="off" autocapitalize="words" placeholder="Your name">
+    </div>
+    <div class="field">
+      <label for="note">A short note <span class="opt">(optional)</span></label>
+      <textarea id="note" name="note" maxlength="140" rows="3" placeholder="You make every day softer."></textarea>
+      <span class="count" id="count">0 / 140</span>
+    </div>
+    <button class="primary" type="submit" id="make">Create their bouquet</button>
+  </form>
+
+  <section class="result" id="result" hidden aria-live="polite">
+    <h2>Their bouquet is ready.</h2>
+    <div class="linkbox" id="link"></div>
+    <div class="row">
+      <button type="button" class="primary" id="copy">Copy link</button>
+      <a class="btn wa" id="wa" target="_blank" rel="noopener">WhatsApp</a>
+      <button type="button" id="share" hidden>Share…</button>
+      <a class="btn" id="open" target="_blank" rel="noopener">Open it</a>
+    </div>
+    <p class="tip">It opens on their name. Music starts when they tap.</p>
+  </section>
+
+  <footer>
+    <a class="star" id="star" href="https://github.com/Devansh-Singhal/ascii-bouquet" target="_blank" rel="noopener">
+      <span aria-hidden="true">★</span> Star it on GitHub <b id="stars"></b>
+    </a>
+    <p class="fine">Open source. Nothing is stored: names and notes live only in the link you share.</p>
+  </footer>
+</main>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (id) => document.getElementById(id);
+  const to = $("to"), from = $("from"), note = $("note");
+  const pv = $("pv");
+  const clean = (v, n) => v.replace(/\s+/g, " ").trim().slice(0, n);
+
+  // live preview: the real bouquet page in preview mode, updated as they type
+  const initial = new URLSearchParams({ preview: "1", to: "", from: "", note: "" });
+  pv.src = "/for?" + initial.toString();
+  let pvReady = false;
+  pv.addEventListener("load", () => { pvReady = true; pushPreview(); });
+  let tmr = 0;
+  function pushPreview() {
+    if (!pvReady) return;
+    pv.contentWindow.postMessage({ type: "bouquet-text", to: clean(to.value, 40), from: clean(from.value, 40), note: clean(note.value, 140) }, location.origin);
+  }
+  function onInput() {
+    $("count").textContent = note.value.length + " / 140";
+    if (to.value.trim()) $("err").hidden = true;
+    clearTimeout(tmr);
+    tmr = setTimeout(pushPreview, 180);
+  }
+  [to, from, note].forEach((el) => el.addEventListener("input", onInput));
+
+  function linkFor() {
+    const q = new URLSearchParams();
+    q.set("to", clean(to.value, 40));
+    if (clean(from.value, 40)) q.set("from", clean(from.value, 40));
+    if (clean(note.value, 140)) q.set("note", clean(note.value, 140));
+    return location.origin + "/for?" + q.toString().replace(/\+/g, "%20");
+  }
+
+  function toast(msg) {
+    const t = $("toast");
+    t.textContent = msg;
+    t.classList.add("on");
+    clearTimeout(toast.t);
+    toast.t = setTimeout(() => t.classList.remove("on"), 1800);
+  }
+
+  let current = "";
+  $("f").addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!to.value.trim()) { $("err").hidden = false; to.focus(); return; }
+    current = linkFor();
+    const name = clean(to.value, 40);
+    $("link").textContent = current;
+    $("open").href = current;
+    $("wa").href = "https://wa.me/?text=" + encodeURIComponent("A little something for you, " + name + " \u{1F338} " + current);
+    if (navigator.share) $("share").hidden = false;
+    $("result").hidden = false;
+    $("result").scrollIntoView({ behavior: "smooth", block: "center" });
+    // counted as a page view of /made, so analytics shows how many bouquets were created
+    try { history.replaceState(null, "", "/made"); window.va && window.va("pageview", { route: "/made", path: "/made" }); } catch (err) {}
+  });
+
+  $("copy").addEventListener("click", () => {
+    const done = () => toast("Link copied");
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(current).then(done).catch(selectLink);
+    } else selectLink();
+  });
+  function selectLink() {
+    const r = document.createRange();
+    r.selectNodeContents($("link"));
+    const sel = window.getSelection();
+    sel.removeAllRanges();
+    sel.addRange(r);
+    toast("Press Copy to copy the link");
+  }
+  $("share").addEventListener("click", () => {
+    navigator.share({ title: "A bouquet for " + clean(to.value, 40), url: current }).catch(() => {});
+  });
+
+  // live star count
+  fetch("https://api.github.com/repos/Devansh-Singhal/ascii-bouquet")
+    .then((r) => (r.ok ? r.json() : null))
+    .then((d) => { if (d && d.stargazers_count > 0) $("stars").textContent = d.stargazers_count.toLocaleString(); })
+    .catch(() => {});
+})();
+</script>
+</body>
+</html>
