@@ -5,7 +5,7 @@
 **Send someone flowers that bloom.**
 Type their name, add a note, share the link. It opens into a 3D lily bouquet made entirely of text characters, with music.
 
-### [→ Make one now (free, no sign-up)](__SITE__)
+### [→ Make one now (free, no sign-up)](https://sendabouquet.vercel.app)
 
 <img src="demo.gif" width="300" alt="A lily bouquet made of coloured text characters growing and blooming, with the note 'for Riya, Happy birthday! — Arjun'">
 
@@ -17,7 +17,7 @@ Type their name, add a note, share the link. It opens into a 3D lily bouquet mad
 
 ## How to send one
 
-1. Open **[the site](__SITE__)**.
+1. Open **[the site](https://sendabouquet.vercel.app)**.
 2. Type their name, and optionally your name and a short note.
 3. Tap **Create**, then **Copy link** or **WhatsApp**.
 
