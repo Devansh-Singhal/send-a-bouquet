@@ -1088,11 +1088,7 @@
 
   let decided = false;
   if (PREVIEW) { decided = true; bgm.preload = "none"; setSound("none"); begin(); }
-  else startMusic(true).then((ok) => {
-    if (decided) return;
-    decided = true;
-    if (ok) begin(); else gate.hidden = false;
-  });
+  else { decided = true; gate.hidden = false; } // always open on their name; the tap starts music and bloom
   // if the audio is slow to load, don't keep the viewer waiting on a blank sky
   setTimeout(() => { if (!decided) { decided = true; begin(); } }, 2500);
 

@@ -141,6 +141,10 @@
   .row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .row > * { min-width: 0; }
   .tip { margin: 0; font-size: 13.5px; color: var(--muted); }
+  .wide { width: 100%; }
+  .qrbox { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 4px; }
+  .qrbox canvas { width: 100%; max-width: 320px; height: auto; aspect-ratio: 1; border-radius: 14px; display: block; }
+  .qrbox .row { width: 100%; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
 
   footer { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 8px; text-align: center; }
   .star {
@@ -199,6 +203,15 @@
       <button type="button" id="share" hidden>Share…</button>
       <a class="btn" id="open" target="_blank" rel="noopener">Open it</a>
     </div>
+    <button type="button" class="wide" id="makeqr">♥ Make a QR code</button>
+    <div class="qrbox" id="qrbox" hidden>
+      <canvas id="qr" width="1000" height="1000" role="img" aria-label="Heart-shaped QR code that opens their bouquet"></canvas>
+      <div class="row">
+        <button type="button" class="primary" id="qrsave">Save QR</button>
+        <button type="button" id="qrshare">Share QR</button>
+      </div>
+      <p class="tip">Print it, stick it on a card or a gift. Any phone camera opens it.</p>
+    </div>
     <p class="tip">It opens on their name. Music starts when they tap.</p>
   </section>
 
@@ -211,6 +224,8 @@
 </main>
 <div class="toast" id="toast" role="status"></div>
 
+<script src="/qrcode.js" defer></script>
+<script src="/heartqr.js" defer></script>
 <script>
 (() => {
   "use strict";
@@ -263,6 +278,8 @@
     $("open").href = current;
     $("wa").href = "https://wa.me/?text=" + encodeURIComponent("A little something for you, " + name + " \u{1F338} " + current);
     if (navigator.share) $("share").hidden = false;
+    $("qrbox").hidden = true;
+    $("makeqr").hidden = false;
     $("result").hidden = false;
     $("result").scrollIntoView({ behavior: "smooth", block: "center" });
     // counted as a page view of /made, so analytics shows how many bouquets were created
@@ -285,6 +302,35 @@
   }
   $("share").addEventListener("click", () => {
     navigator.share({ title: "A bouquet for " + clean(to.value, 40), url: current }).catch(() => {});
+  });
+
+  // heart-shaped QR code for the link
+  function qrName() { return "bouquet-for-" + (clean(to.value, 40).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "you") + ".png"; }
+  $("makeqr").addEventListener("click", () => {
+    if (!current || !window.drawHeartQR) return;
+    window.drawHeartQR($("qr"), current);
+    $("qrbox").hidden = false;
+    $("makeqr").hidden = true;
+    $("qrshare").hidden = !(navigator.canShare && navigator.canShare({ files: [new File([""], "x.png", { type: "image/png" })] }));
+    $("qrbox").scrollIntoView({ behavior: "smooth", block: "center" });
+  });
+  $("qrsave").addEventListener("click", () => {
+    $("qr").toBlob((blob) => {
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = qrName();
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      toast("QR saved");
+    }, "image/png");
+  });
+  $("qrshare").addEventListener("click", () => {
+    $("qr").toBlob((blob) => {
+      const file = new File([blob], qrName(), { type: "image/png" });
+      navigator.share({ files: [file], title: "A bouquet for " + clean(to.value, 40) }).catch(() => {});
+    }, "image/png");
   });
 
   // live star count
