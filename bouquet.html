@@ -13,6 +13,8 @@
   // visitor stats, except for the live preview on the create page (otherwise every visit there would count as a bouquet opened)
   if (!/[?&]preview=1/.test(location.search)) {
     window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };
+    // send only the page (/for), never the name or note in the link
+    window.va("beforeSend", function (e) { return Object.assign({}, e, { url: String(e.url).split(/[?#]/)[0] }); });
     var s = document.createElement("script"); s.defer = true; s.src = "/_vercel/insights/script.js"; document.head.appendChild(s);
   }
 </script>
@@ -794,6 +796,7 @@
 
   // ================= screen setup =================
   let W, H, dpr, cw, ch, cols, rows, S, ox, oy, stars;
+  let QUALITY_DROP = 0; // 0 = full detail; raised automatically on slow devices
   const SCN = 2; // hidden-canvas pixels per cell, per axis
 
   function layout() {
@@ -812,7 +815,7 @@
     BOTTOM = (H - oy) / S + 40; // stems continue past the bottom edge
 
     // fine grid: about 260 character rows across the bouquet's height
-    ch = Math.max(5, Math.round((1180 * S) / 260));
+    ch = Math.max(5, Math.round((1180 * S) / (260 / (1 + 0.38 * QUALITY_DROP))));
     cw = Math.max(3, Math.round(ch * 0.78));
     cols = Math.ceil(W / cw);
     rows = Math.ceil(H / ch);
@@ -1018,8 +1021,26 @@
 
   function render(t, fade) { paintScene(t, fade); out.draw(); }
 
+  // watch the frame time while the bouquet is growing; on a slow phone, step the detail down (at most twice)
+  let lastNow = 0, ema = 16, frames = 0;
+  function watchSpeed(now) {
+    if (lastNow) {
+      const dt = Math.min(200, now - lastNow);
+      ema = ema * 0.9 + dt * 0.1;
+      if (++frames > 45 && ema > 30 && QUALITY_DROP < 2) {
+        QUALITY_DROP++;
+        frames = 0;
+        ema = 16;
+        layout();
+        out.resize();
+      }
+    }
+    lastNow = now;
+  }
+
   function frame(now) {
     if (paused) return;
+    if (started && !PREVIEW) watchSpeed(now);
     if (!started) { render(0); requestAnimationFrame(frame); return; }
     let t = (now - t0) / 1000;
     let fade;

@@ -9,13 +9,17 @@
 <meta property="og:type" content="website">
 <meta property="og:title" content="Send someone flowers that bloom 🌸">
 <meta property="og:description" content="Type their name, add a note, share the link. Free, no sign-up.">
-<meta property="og:image" content="/og.png">
+<meta property="og:image" content="https://sendabouquet.vercel.app/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:url" content="https://sendabouquet.vercel.app/">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
 <meta name="twitter:card" content="summary_large_image">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23e8344a' d='M16 29.5S3.5 21.6 3.5 12.6A6.6 6.6 0 0 1 16 9.4a6.6 6.6 0 0 1 12.5 3.2c0 9-12.5 16.9-12.5 16.9z'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;1,500&family=Karla:wght@400;500;700&display=swap">
-<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); };</script>
+<script>window.va = window.va || function () { (window.vaq = window.vaq || []).push(arguments); }; window.va("beforeSend", function (e) { return Object.assign({}, e, { url: String(e.url).split(/[?#]/)[0] }); });</script>
 <script defer src="/_vercel/insights/script.js"></script>
 <style>
   /* One centred column on a night sky: a live preview of their bouquet, three fields, then share. */
@@ -219,7 +223,7 @@
     <a class="star" id="star" href="https://github.com/Devansh-Singhal/send-a-bouquet" target="_blank" rel="noopener">
       <span aria-hidden="true">★</span> Star it on GitHub <b id="stars"></b>
     </a>
-    <p class="fine">Open source. Nothing is stored: names and notes live only in the link you share.</p>
+    <p class="fine">Open source. Names and notes aren’t saved anywhere: they live only in the link you share.</p>
   </footer>
 </main>
 <div class="toast" id="toast" role="status"></div>
