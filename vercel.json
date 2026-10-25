@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/for", "destination": "/api/for" },
+    { "source": "/f", "destination": "/api/for" },
     { "source": "/made", "destination": "/" }
   ],
   "functions": { "api/for.js": { "includeFiles": "bouquet.html" } },

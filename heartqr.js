@@ -34,13 +34,19 @@
   function drawHeartQR(canvas, text, opts) {
     const o = Object.assign({ size: 1000, fg: "#c8232f", bg: "#000000", gap: 2, density: 0.5, round: true, deco: true, inset: 0.04, radius: 0.4 }, opts || {});
     // strongest error correction that keeps the code from getting too dense (long notes make long links)
-    let qr;
-    for (const level of ["H", "Q", "M", "L"]) {
-      qr = root.qrcode(0, level);
-      qr.addData(unescape(encodeURIComponent(text)), "Byte");
-      qr.make();
-      if (qr.getModuleCount() <= 57) break;
-    }
+    // Fewer, bigger squares scan far more reliably (iPhone Photos is strict), so take the
+    // smallest grid any level gives, then the strongest error correction that fits it (or fits 29x29).
+    const bytes = unescape(encodeURIComponent(text));
+    const made = ["L", "M", "Q", "H"].map((level) => {
+      const q = root.qrcode(0, level);
+      q.addData(bytes, "Byte");
+      q.make();
+      return q;
+    });
+    const smallest = Math.min(...made.map((q) => q.getModuleCount()));
+    const limit = Math.max(smallest, 29);
+    let qr = made[0];
+    for (const q of made) if (q.getModuleCount() <= limit) qr = q;
     const n = qr.getModuleCount();
     const dark = (r, c) => r >= 0 && c >= 0 && r < n && c < n && qr.isDark(r, c);
     const inFinder = (r, c) =>
@@ -111,5 +117,24 @@
     return { modules: n };
   }
 
+  // Plain square QR (dark on white, standard quiet zone): the fallback that every scanner reads.
+  function drawPlainQR(canvas, text, opts) {
+    const o = Object.assign({ size: 1000, fg: "#1a0d10", bg: "#ffffff" }, opts || {});
+    const qr = root.qrcode(0, "M");
+    qr.addData(unescape(encodeURIComponent(text)), "Byte");
+    qr.make();
+    const n = qr.getModuleCount(), quiet = 4;
+    const m = Math.floor(o.size / (n + quiet * 2));
+    const off = Math.floor((o.size - m * n) / 2);
+    canvas.width = canvas.height = o.size;
+    const g = canvas.getContext("2d");
+    g.fillStyle = o.bg;
+    g.fillRect(0, 0, o.size, o.size);
+    g.fillStyle = o.fg;
+    for (let r = 0; r < n; r++) for (let c = 0; c < n; c++) if (qr.isDark(r, c)) g.fillRect(off + c * m, off + r * m, m, m);
+    return { modules: n };
+  }
+
   root.drawHeartQR = drawHeartQR;
+  root.drawPlainQR = drawPlainQR;
 })(typeof window !== "undefined" ? window : globalThis);

@@ -164,9 +164,9 @@
   // ================= who it's for (from the link) =================
   const Q = new URLSearchParams(location.search);
   const clean = (v, n) => (v || "").replace(/[\u0000-\u001f\u007f]/g, "").replace(/\s+/g, " ").trim().slice(0, n);
-  const TO = clean(Q.get("to"), 40);
-  const FROM = clean(Q.get("from"), 40);
-  const NOTE = clean(Q.get("note"), 140);
+  const TO = clean(Q.get("t") || Q.get("to"), 40);
+  const FROM = clean(Q.get("f") || Q.get("from"), 40);
+  const NOTE = clean(Q.get("n") || Q.get("note"), 140);
   const PREVIEW = Q.get("preview") === "1"; // used by the create page's live preview: no gate, no sound
   const HAS_TEXT = true;
 

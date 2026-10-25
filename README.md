@@ -31,7 +31,7 @@ Nothing is stored anywhere. The name and note live only inside the link you shar
 
 - **The flowers:** 13 lilies, each made of six curved, folded petals in real 3D. They open from round buds, turn toward the viewer and sway in a breeze. Everything is drawn on a hidden canvas every frame.
 - **The ASCII look:** a WebGL shader turns that hidden picture into a grid of coloured characters, where brighter cells get denser characters, with brightness jitter for a brushed texture. There's a Canvas 2D fallback.
-- **Link previews:** a tiny serverless function adds "A bouquet for [their name] 🌸" to each link, so WhatsApp and iMessage show the name in the preview.
+- **Link previews:** a tiny serverless function adds "A bouquet for [their name] 🌸" to each link (links look like `/f?t=Name&f=From&n=Note`), so WhatsApp and iMessage show the name in the preview.
 - It's plain HTML, CSS and JavaScript, with no framework and no build step. It works on phones.
 
 ## Make your own copy

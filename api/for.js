@@ -12,8 +12,8 @@ const esc = (v) =>
 
 module.exports = (req, res) => {
   const url = new URL(req.url, "https://placeholder.local");
-  const to = clean(url.searchParams.get("to"), 40);
-  const from = clean(url.searchParams.get("from"), 40);
+  const to = clean(url.searchParams.get("t") || url.searchParams.get("to"), 40);
+  const from = clean(url.searchParams.get("f") || url.searchParams.get("from"), 40);
   const host = req.headers["x-forwarded-host"] || req.headers.host || "";
   const origin = host ? `https://${host}` : "";
 

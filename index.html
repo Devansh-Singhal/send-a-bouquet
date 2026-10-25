@@ -81,13 +81,15 @@
     width: 100%;
     max-width: 100%;
     aspect-ratio: 4 / 5;
-    max-height: 58vh;
+    max-height: 44vh;
+    max-height: 44svh;
     border-radius: 18px;
     overflow: hidden;
     border: 1px solid var(--line);
     background: #000;
   }
   .preview iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; pointer-events: none; }
+  .preview .shield { position: absolute; inset: 0; touch-action: pan-y; }
   .preview .tag {
     position: absolute; left: 12px; top: 12px;
     font: 500 10px/1 var(--mono); letter-spacing: 0.22em; text-transform: uppercase;
@@ -148,6 +150,7 @@
   .wide { width: 100%; }
   .qrbox { display: flex; flex-direction: column; align-items: center; gap: 12px; padding-top: 4px; }
   .qrbox canvas { width: 100%; max-width: 320px; height: auto; aspect-ratio: 1; border-radius: 14px; display: block; }
+  .linkish { background: none; border: 0; padding: 6px; color: var(--muted); font: 500 14px/1.3 var(--body); text-decoration: underline; text-underline-offset: 3px; }
   .qrbox .row { width: 100%; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); }
 
   footer { display: flex; flex-direction: column; align-items: center; gap: 10px; padding-top: 8px; text-align: center; }
@@ -178,6 +181,7 @@
   <div class="preview" aria-label="Live preview of the bouquet">
     <iframe id="pv" title="Bouquet preview" tabindex="-1" aria-hidden="true"></iframe>
     <span class="tag">live preview</span>
+    <div class="shield" aria-hidden="true"></div>
   </div>
 
   <form id="f" novalidate>
@@ -214,7 +218,8 @@
         <button type="button" class="primary" id="qrsave">Save QR</button>
         <button type="button" id="qrshare">Share QR</button>
       </div>
-      <p class="tip">Print it, stick it on a card or a gift. Any phone camera opens it.</p>
+      <p class="tip">Print it, stick it on a card or a gift. Shorter notes make a simpler QR that scans faster.</p>
+      <button type="button" class="linkish" id="qrstyle">Not scanning? Use a plain QR</button>
     </div>
     <p class="tip">It opens on their name. Music starts when they tap.</p>
   </section>
@@ -257,11 +262,12 @@
   [to, from, note].forEach((el) => el.addEventListener("input", onInput));
 
   function linkFor() {
-    const q = new URLSearchParams();
-    q.set("to", clean(to.value, 40));
-    if (clean(from.value, 40)) q.set("from", clean(from.value, 40));
-    if (clean(note.value, 140)) q.set("note", clean(note.value, 140));
-    return location.origin + "/for?" + q.toString().replace(/\+/g, "%20");
+    // short keys and "+" for spaces keep the link (and its QR code) as small as possible
+    const enc = (v) => encodeURIComponent(v).replace(/%20/g, "+");
+    let q = "t=" + enc(clean(to.value, 40));
+    if (clean(from.value, 40)) q += "&f=" + enc(clean(from.value, 40));
+    if (clean(note.value, 140)) q += "&n=" + enc(clean(note.value, 140));
+    return location.origin + "/f?" + q;
   }
 
   function toast(msg) {
@@ -308,11 +314,18 @@
     navigator.share({ title: "A bouquet for " + clean(to.value, 40), url: current }).catch(() => {});
   });
 
-  // heart-shaped QR code for the link
+  // heart-shaped QR code for the link (or a plain one, if a scanner struggles)
+  let plainQR = false;
+  function drawQR() {
+    (plainQR ? window.drawPlainQR : window.drawHeartQR)($("qr"), current);
+    $("qrstyle").textContent = plainQR ? "Back to the heart QR" : "Not scanning? Use a plain QR";
+  }
+  $("qrstyle").addEventListener("click", () => { plainQR = !plainQR; drawQR(); });
   function qrName() { return "bouquet-for-" + (clean(to.value, 40).toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "you") + ".png"; }
   $("makeqr").addEventListener("click", () => {
     if (!current || !window.drawHeartQR) return;
-    window.drawHeartQR($("qr"), current);
+    plainQR = false;
+    drawQR();
     $("qrbox").hidden = false;
     $("makeqr").hidden = true;
     $("qrshare").hidden = !(navigator.canShare && navigator.canShare({ files: [new File([""], "x.png", { type: "image/png" })] }));
