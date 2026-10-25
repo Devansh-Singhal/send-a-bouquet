@@ -216,7 +216,7 @@
   </section>
 
   <footer>
-    <a class="star" id="star" href="https://github.com/Devansh-Singhal/ascii-bouquet" target="_blank" rel="noopener">
+    <a class="star" id="star" href="https://github.com/Devansh-Singhal/send-a-bouquet" target="_blank" rel="noopener">
       <span aria-hidden="true">★</span> Star it on GitHub <b id="stars"></b>
     </a>
     <p class="fine">Open source. Nothing is stored: names and notes live only in the link you share.</p>
@@ -334,7 +334,7 @@
   });
 
   // live star count
-  fetch("https://api.github.com/repos/Devansh-Singhal/ascii-bouquet")
+  fetch("https://api.github.com/repos/Devansh-Singhal/send-a-bouquet")
     .then((r) => (r.ok ? r.json() : null))
     .then((d) => { if (d && d.stargazers_count > 0) $("stars").textContent = d.stargazers_count.toLocaleString(); })
     .catch(() => {});

@@ -38,7 +38,7 @@ Nothing is stored anywhere. The name and note live only inside the link you shar
 
 Fork this repo (top right) and import your fork on [Vercel](https://vercel.com/new), or click:
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Devansh-Singhal/ascii-bouquet)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/Devansh-Singhal/send-a-bouquet)
 
 Free to use and change under the MIT license. Please keep the credit, and a ⭐ is always appreciated.
 
