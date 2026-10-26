@@ -37,5 +37,5 @@ module.exports = (req, res) => {
 
   res.setHeader("Content-Type", "text/html; charset=utf-8");
   res.setHeader("Cache-Control", "public, max-age=0, s-maxage=86400, stale-while-revalidate=604800");
-  res.end(template.replace("<!--META-->", meta));
+  res.end(template.replace("<!--META-->", () => meta).replace("<!--GATE_NAME-->", () => esc(to || "for you")));
 };
