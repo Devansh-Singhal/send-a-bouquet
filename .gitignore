@@ -1,0 +1,9 @@
+.vercel/
+node_modules/
+.env*
+WORKFLOW.md
+PRODUCT.md
+DESIGN.md
+docs/
+work/
+.private/
