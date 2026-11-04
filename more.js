@@ -7,7 +7,7 @@
     { id: 'bouquet', name: 'Send a Bouquet', line: 'Lilies made of text, with music', url: 'https://sendabouquet.vercel.app' },
     { id: 'heart', name: 'Send a Heart', line: 'A heart drawn line by line', url: 'https://send-a-heart.vercel.app' },
     { id: 'spiral', name: 'Send a Spiral', line: 'Their photo in a spiral of I love yous', url: 'https://send-a-spiral.vercel.app' },
-    { id: 'equation', name: 'Send an Equation', line: 'Your hand-drawn heart, redrawn by math', url: 'https://send-an-equation.vercel.app' }
+    { id: 'handdrawn', name: 'Hand-drawn Heart', line: 'Draw a heart; math redraws it for them', url: 'https://hand-drawn-heart.vercel.app' }
   ];
   const NEXT = { name: 'Coming next', line: 'A birthday cake they blow out themselves' };
   const tag = document.querySelector('script[data-site]');

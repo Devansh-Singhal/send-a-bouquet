@@ -24,7 +24,7 @@ function run(site) {
 const links = node => { const out = []; const stack = [node]; while (stack.length) { const c = stack.shift(); if (c.tagName === 'a') out.push(c.href); stack.push(...(c.children || [])); } return out; };
 
 test('each site shows cards for the other sites, never itself', () => {
-  for (const site of ['bouquet', 'heart', 'spiral', 'equation']) {
+  for (const site of ['bouquet', 'heart', 'spiral', 'handdrawn']) {
     const { body, footer } = run(site);
     const rails = links(body).sort();
     const row = links(footer.beforeNode).sort();
@@ -32,6 +32,6 @@ test('each site shows cards for the other sites, never itself', () => {
     assert.deepEqual(rails, row);
     assert.ok(rails.every(u => /^https:\/\/[a-z-]+\.vercel\.app\/$/.test(u)));
   }
-  assert.ok(!links(run('equation').body).some(u => u.includes('send-an-equation')));
+  assert.ok(!links(run('handdrawn').body).some(u => u.includes('hand-drawn-heart')));
   assert.ok(!links(run('bouquet').body).some(u => u.includes('sendabouquet')));
 });
