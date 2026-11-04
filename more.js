@@ -49,13 +49,12 @@ a.mx-card:focus-visible{outline:2px solid #ff98a6;outline-offset:3px}
     const picture = document.createElement('picture');
     const still = document.createElement('source');
     still.media = '(prefers-reduced-motion: reduce)';
-    still.srcset = site.url + '/card.jpg';
+    still.dataset.srcset = '/cards/' + site.id + '.jpg';
     const img = document.createElement('img');
-    img.src = site.url + '/card.webp';
+    img.dataset.src = '/cards/' + site.id + '.webp';   // every site serves all the card animations itself: same origin, no extra connections
     img.alt = '';
-    img.loading = 'lazy';
     img.decoding = 'async';
-    img.width = 400; img.height = 300;
+    img.width = 320; img.height = 240;
     img.addEventListener('error', () => { picture.style.visibility = 'hidden'; }, { once: true });
     picture.append(still, img);
     const name = document.createElement('span'); name.className = 'mx-n'; name.textContent = site.name;
@@ -101,4 +100,12 @@ a.mx-card:focus-visible{outline:2px solid #ff98a6;outline-offset:3px}
   const footer = main && main.querySelector('footer');
   if (footer) footer.before(inline); else if (main) main.append(inline);
   document.body.append(left, right);
+
+  // the card animations load right after the page itself, so they are already playing when someone looks at them
+  function startCards() {
+    document.querySelectorAll('.mx-card source[data-srcset]').forEach(s => { s.srcset = s.dataset.srcset; s.removeAttribute('data-srcset'); });
+    document.querySelectorAll('.mx-card img[data-src]').forEach(i => { i.fetchPriority = 'low'; i.src = i.dataset.src; i.removeAttribute('data-src'); });
+  }
+  if (document.readyState === 'complete') setTimeout(startCards, 0);
+  else window.addEventListener('load', () => setTimeout(startCards, 100), { once: true });
 })();

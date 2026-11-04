@@ -16,9 +16,9 @@ function el(tag) {
 function run(site) {
   const footer = el('footer'), main = el('main'), body = el('body'), head = el('head');
   main.querySelector = sel => (sel === 'footer' ? footer : null);
-  const document = { head, body, createElement: el,
+  const document = { head, body, createElement: el, readyState: 'loading', querySelectorAll: () => [],
     querySelector: sel => (sel === 'script[data-site]' ? { dataset: { site } } : sel === 'main' ? main : null) };
-  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../more.js'), 'utf8'), { document, location: { hostname: 'localhost' } });
+  vm.runInNewContext(fs.readFileSync(path.join(__dirname, '../more.js'), 'utf8'), { document, location: { hostname: 'localhost' }, window: { addEventListener() {} }, setTimeout });
   return { body, footer };
 }
 const links = node => { const out = []; const stack = [node]; while (stack.length) { const c = stack.shift(); if (c.tagName === 'a') out.push(c.href); stack.push(...(c.children || [])); } return out; };
